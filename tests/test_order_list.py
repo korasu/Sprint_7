@@ -1,6 +1,6 @@
 import allure
 from request_generator.order_req import OrderReq
-from data import Data
+from data import StatusCode
 
 
 class TestOrderList:
@@ -11,4 +11,4 @@ class TestOrderList:
         response = order.order_list_request()
         r = response.json()
 
-        assert response.status_code == Data.success_status_code and r["orders"] != []
+        assert response.status_code == StatusCode.success_status_code and r["orders"] != []

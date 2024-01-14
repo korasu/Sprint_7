@@ -1,8 +1,11 @@
 import allure
 import pytest
+
 from helpers.generate_order_data import *
-from data import Data, OrderData
+from data import OrderData, StatusCode
 from request_generator.order_req import OrderReq
+
+
 class TestCreateOrdering:
     @allure.title('Создание заказа на самокат')
     @allure.description('Проверка различных вариантов создания заказов по цветам скутеров')
@@ -13,7 +16,7 @@ class TestCreateOrdering:
         order = OrderReq()
         response = order.create_order_request(order_data)
 
-        assert response.status_code == Data.create_status_code
+        assert response.status_code == StatusCode.create_status_code
 
     @allure.title('Создание заказа на самокат')
     @allure.description('Проверяем, что после заказа выдается track')

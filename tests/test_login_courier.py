@@ -2,9 +2,10 @@ import random
 
 import allure
 
+from helpers.generate_courier_data import *
 from helpers.remove_added_courier import *
 from request_generator.courier_req import CourierReq
-from data import Data
+from data import StatusCode, ResponseBody
 
 
 class TestLoginCourier:
@@ -14,7 +15,7 @@ class TestLoginCourier:
         requests = CourierReq()
         response = requests.courier_login(register_new_courier_and_return_login_password)
 
-        assert response.status_code == Data.success_status_code
+        assert response.status_code == StatusCode.success_status_code
 
         delete_created_courier(register_new_courier_and_return_login_password)
 
@@ -25,7 +26,7 @@ class TestLoginCourier:
         response = requests.courier_login({"login": register_new_courier_and_return_login_password['login'],
                                            "password": register_new_courier_and_return_login_password['password']})
 
-        assert response.status_code == Data.success_status_code
+        assert response.status_code == StatusCode.success_status_code
 
         delete_created_courier({"login": register_new_courier_and_return_login_password['login'],
                                 "password": register_new_courier_and_return_login_password['password']})
@@ -38,7 +39,7 @@ class TestLoginCourier:
                                            "password": register_new_courier_and_return_login_password["password"]})
         r = response.json()
 
-        assert r["message"] == Data.login_without_data and response.status_code == Data.bad_request_status_code
+        assert r["message"] == ResponseBody.login_without_data and response.status_code == StatusCode.bad_request_status_code
 
     @allure.title('Авторизация без пароля')
     @allure.description('Проверить корректность вывода ошибки и кода ошибки')
@@ -48,7 +49,7 @@ class TestLoginCourier:
                                            "password": ""})
         r = response.json()
 
-        assert r["message"] == Data.login_without_data and response.status_code == Data.bad_request_status_code
+        assert r["message"] == ResponseBody.login_without_data and response.status_code == StatusCode.bad_request_status_code
 
     @allure.title('Авторизация курьера для получения id')
     @allure.description('Проверяем, что в теле ответа приходит id')
@@ -65,14 +66,11 @@ class TestLoginCourier:
 
     @allure.title('Авторизация не существующего курьера')
     @allure.description('Проверяем, что в случае не существующего курьера, будет ошибка')
-    def test_login_courier_answer_body_have_id(self, register_new_courier_and_return_login_password):
+    def test_login_courier_answer_body_have_id(self):
+        courier_data = generate_courier_data()
         requests = CourierReq()
-        response = requests.courier_login(
-            {"login": (register_new_courier_and_return_login_password["login"] + str(random.randint(1, 10))),
-             "password": register_new_courier_and_return_login_password["password"]})
+        response = requests.courier_login({"login": courier_data["login"], "password": courier_data["password"]})
         r = response.json()
 
-        assert r["message"] == Data.login_with_incorrect_data and response.status_code == Data.not_found_status_code
+        assert r["message"] == ResponseBody.login_with_incorrect_data and response.status_code == StatusCode.not_found_status_code
 
-        delete_created_courier({"login": register_new_courier_and_return_login_password["login"],
-                                "password": register_new_courier_and_return_login_password["password"]})
